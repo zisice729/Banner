@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: banner-consumer-system
+  datasource:
+    url: jdbc:mysql://localhost:3306/banner_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: banner-consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+banner:
+  lock-timeout-seconds: 30
+  max-retry-attempts: 5
+  initial-retry-interval-ms: 100
+  incremental-window-minutes: 10
+
+logging:
+  level:
+    com.banner: INFO
+    org.springframework.kafka: INFO
