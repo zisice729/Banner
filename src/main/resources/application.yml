@@ -2,8 +2,6 @@ server:
   port: 8080
 
 spring:
-  application:
-    name: banner-consumer-system
   datasource:
     url: jdbc:mysql://localhost:3306/banner_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
@@ -13,9 +11,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
   data:
     redis:
       host: localhost
@@ -35,6 +30,7 @@ banner:
   max-retry-attempts: 5
   initial-retry-interval-ms: 100
   incremental-window-minutes: 10
+  bucket-size: 1000
 
 logging:
   level:

@@ -1,19 +1,14 @@
 package com.banner.common.dto;
 
-import java.time.LocalDate;
+import java.util.List;
 
 public class BannerInfo {
 
     private String bannerId;
-    private String productId;
-    private String title;
-    private String imageUrl;
-    private String linkUrl;
-    private Integer priority;
-    private Integer status;
-    private LocalDate startDay;
-    private LocalDate endDay;
-    private Long updateTime;
+    private Integer bucketIndex;
+    private Integer totalBuckets;
+    private List<Long> userIds;
+    private Long version;
     private String changeType;
 
     public BannerInfo() {
@@ -27,76 +22,36 @@ public class BannerInfo {
         this.bannerId = bannerId;
     }
 
-    public String getProductId() {
-        return productId;
+    public Integer getBucketIndex() {
+        return bucketIndex;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public void setBucketIndex(Integer bucketIndex) {
+        this.bucketIndex = bucketIndex;
     }
 
-    public String getTitle() {
-        return title;
+    public Integer getTotalBuckets() {
+        return totalBuckets;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTotalBuckets(Integer totalBuckets) {
+        this.totalBuckets = totalBuckets;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<Long> getUserIds() {
+        return userIds;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setUserIds(List<Long> userIds) {
+        this.userIds = userIds;
     }
 
-    public String getLinkUrl() {
-        return linkUrl;
+    public Long getVersion() {
+        return version;
     }
 
-    public void setLinkUrl(String linkUrl) {
-        this.linkUrl = linkUrl;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public LocalDate getStartDay() {
-        return startDay;
-    }
-
-    public void setStartDay(LocalDate startDay) {
-        this.startDay = startDay;
-    }
-
-    public LocalDate getEndDay() {
-        return endDay;
-    }
-
-    public void setEndDay(LocalDate endDay) {
-        this.endDay = endDay;
-    }
-
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public String getChangeType() {
