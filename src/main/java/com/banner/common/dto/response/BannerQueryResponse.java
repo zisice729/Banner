@@ -1,27 +1,27 @@
-package com.banner.common.dto;
+package com.banner.common.dto.response;
 
 import java.util.List;
 
-public class BannerListResponse {
+public class BannerQueryResponse {
 
-    private String productId;
+    private Integer productId;
     private String date;
     private List<BannerSimpleInfo> banners;
 
-    public BannerListResponse() {
+    public BannerQueryResponse() {
     }
 
-    public BannerListResponse(String productId, String date, List<BannerSimpleInfo> banners) {
+    public BannerQueryResponse(Integer productId, String date, List<BannerSimpleInfo> banners) {
         this.productId = productId;
         this.date = date;
         this.banners = banners;
     }
 
-    public String getProductId() {
+    public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(String productId) {
+    public void setProductId(Integer productId) {
         this.productId = productId;
     }
 
@@ -42,7 +42,8 @@ public class BannerListResponse {
     }
 
     public static class BannerSimpleInfo {
-        private String bannerId;
+
+        private Long id;
         private String title;
         private String imageUrl;
         private String linkUrl;
@@ -51,20 +52,20 @@ public class BannerListResponse {
         public BannerSimpleInfo() {
         }
 
-        public BannerSimpleInfo(String bannerId, String title, String imageUrl, String linkUrl, Integer priority) {
-            this.bannerId = bannerId;
+        public BannerSimpleInfo(Long id, String title, String imageUrl, String linkUrl, Integer priority) {
+            this.id = id;
             this.title = title;
             this.imageUrl = imageUrl;
             this.linkUrl = linkUrl;
             this.priority = priority;
         }
 
-        public String getBannerId() {
-            return bannerId;
+        public Long getId() {
+            return id;
         }
 
-        public void setBannerId(String bannerId) {
-            this.bannerId = bannerId;
+        public void setId(Long id) {
+            this.id = id;
         }
 
         public String getTitle() {
@@ -99,5 +100,4 @@ public class BannerListResponse {
             this.priority = priority;
         }
     }
-
 }

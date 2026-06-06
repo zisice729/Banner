@@ -1,0 +1,11 @@
+# IDE 配置（不要提交）
+.idea/
+*.iml
+.DS_Store
+
+# 编译输出（不要提交）
+target/
+*.class
+
+# 日志文件
+*.log

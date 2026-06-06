@@ -1,16 +1,20 @@
 package com.banner.service;
 
-import com.banner.common.dto.SimpleBannerInfo;
+import com.banner.common.dto.request.BannerSyncRequest;
 
 import java.util.List;
 
 public interface BannerCacheManager {
 
-    void setBanner(String productId, String date, SimpleBannerInfo bannerInfo);
+    void refreshBannerCache(Long id, BannerSyncRequest data);
 
-    void deleteBanner(String productId, String date, String bannerId);
+    void deleteBannerCache(Long id);
 
-    List<SimpleBannerInfo> getBannersByDate(String productId, String date);
+    BannerSyncRequest getBannerFromCache(Long id);
 
-    void refreshBannersByDate(String productId, String date, List<SimpleBannerInfo> banners);
+    List<Long> getUserIdsFromCache(Long id);
+
+    boolean containsUserId(Long id, Long userId);
+
+    List<BannerSyncRequest> getBannersByProductAndDate(Integer productId, String date);
 }

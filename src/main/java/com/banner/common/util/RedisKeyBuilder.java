@@ -2,49 +2,34 @@ package com.banner.common.util;
 
 public class RedisKeyBuilder {
 
-    private static final String BANNER_CACHE_PREFIX = "banner:";
-    private static final String BANNER_LOCK_PREFIX = "lock:banner:";
-    private static final String USER_BUCKET_PREFIX = "banner:user:bucket:";
-    private static final String USER_BUCKET_VERSION_PREFIX = "banner:user:version:";
-    private static final String USER_BUCKET_TOTAL_PREFIX = "banner:user:total:";
-    private static final String USER_BUCKET_TEMP_PREFIX = "banner:user:temp:";
+    private static final String BANNER_CACHE_KEY = "banner:%d:info";
+    private static final String BANNER_USER_BUCKET_KEY = "banner:%d:users:%d";
+    private static final String BANNER_USER_BUCKET_COUNT_KEY = "banner:%d:users:bucket_count";
+    private static final String BANNER_LOCK_KEY = "banner:%d:lock";
+    private static final String BANNER_PRODUCT_DATE_KEY = "banner:product:%d:date:%s";
+
+    public static final String CACHE_INVALIDATE_CHANNEL = "banner:cache:invalidate";
 
     private RedisKeyBuilder() {
     }
 
-    public static String bannerCache(String productId, String date) {
-        return BANNER_CACHE_PREFIX + productId + ":" + date;
+    public static String bannerCache(Long id) {
+        return String.format(BANNER_CACHE_KEY, id);
     }
 
-    public static String bannerLock(String productId, String date) {
-        return BANNER_LOCK_PREFIX + productId + ":" + date;
+    public static String bannerUserBucket(Long id, int bucketIndex) {
+        return String.format(BANNER_USER_BUCKET_KEY, id, bucketIndex);
     }
 
-    public static String userBucket(String bannerId, int bucketIndex) {
-        return USER_BUCKET_PREFIX + bannerId + ":" + bucketIndex;
+    public static String bannerUserBucketCount(Long id) {
+        return String.format(BANNER_USER_BUCKET_COUNT_KEY, id);
     }
 
-    public static String userBucketPattern(String bannerId) {
-        return USER_BUCKET_PREFIX + bannerId + ":*";
+    public static String bannerLock(Long id) {
+        return String.format(BANNER_LOCK_KEY, id);
     }
 
-    public static String userBucketVersion(String bannerId) {
-        return USER_BUCKET_VERSION_PREFIX + bannerId;
-    }
-
-    public static String userBucketTotal(String bannerId) {
-        return USER_BUCKET_TOTAL_PREFIX + bannerId;
-    }
-
-    public static String tempBatchData(String bannerId, Long version, int batchIndex) {
-        return USER_BUCKET_TEMP_PREFIX + bannerId + ":" + version + ":batch:" + batchIndex;
-    }
-
-    public static String tempBatchMeta(String bannerId, Long version) {
-        return USER_BUCKET_TEMP_PREFIX + bannerId + ":" + version + ":meta";
-    }
-
-    public static String tempBatchPattern(String bannerId) {
-        return USER_BUCKET_TEMP_PREFIX + bannerId + ":*";
+    public static String bannerProductDate(Integer productId, String date) {
+        return String.format(BANNER_PRODUCT_DATE_KEY, productId, date);
     }
 }

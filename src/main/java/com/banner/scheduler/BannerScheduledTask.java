@@ -1,23 +1,16 @@
 package com.banner.scheduler;
 
-import com.banner.common.constant.BannerConstants;
-import com.banner.common.entity.SimpleBanner;
-import com.banner.common.util.DateUtil;
-import com.banner.common.util.RedisKeyBuilder;
-import com.banner.lock.RedisDistributedLock;
-import com.banner.repository.SimpleBannerRepository;
-import com.banner.service.BannerSyncService;
-import com.banner.service.BannerUserListService;
+import com.banner.client.BannerOperationClient;
+import com.banner.common.dto.request.BannerSyncRequest;
+import com.banner.service.BannerCacheManager;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Component
 public class BannerScheduledTask {
@@ -25,75 +18,56 @@ public class BannerScheduledTask {
     private static final Logger log = LoggerFactory.getLogger(BannerScheduledTask.class);
 
     @Autowired
-    private SimpleBannerRepository simpleBannerRepository;
+    private BannerOperationClient bannerOperationClient;
 
     @Autowired
-    private BannerSyncService bannerSyncService;
+    private BannerCacheManager bannerCacheManager;
 
-    @Autowired
-    private BannerUserListService bannerUserListService;
-
-    @Autowired
-    private RedisDistributedLock redisDistributedLock;
-
-    @Scheduled(fixedRate = 5 * 60 * 1000)
-    public void incrementalRefresh() {
+    @XxlJob("incrementalSyncJob")
+    public void incrementalSync() {
+        log.info("incrementalSync start");
         try {
-            LocalDateTime updateTime = LocalDateTime.now().minusMinutes(BannerConstants.INCREMENTAL_WINDOW_MINUTES);
-            List<SimpleBanner> banners = simpleBannerRepository.findByUpdateTimeAfter(updateTime);
+            long sinceTime = System.currentTimeMillis() - 5 * 60 * 1000;
+            List<Long> updatedIds = bannerOperationClient.getIncrementalUpdatedIds(sinceTime);
 
-            Map<String, List<SimpleBanner>> groupedByProduct = banners.stream()
-                    .collect(Collectors.groupingBy(SimpleBanner::getProductId));
-
-            for (Map.Entry<String, List<SimpleBanner>> entry : groupedByProduct.entrySet()) {
-                String productId = entry.getKey();
-
-                for (SimpleBanner banner : entry.getValue()) {
-                    refreshBannerAndUserList(productId, banner);
+            for (Long id : updatedIds) {
+                try {
+                    BannerSyncRequest data = bannerOperationClient.getBannerById(id);
+                    if (Objects.nonNull(data)) {
+                        bannerCacheManager.refreshBannerCache(id, data);
+                    }
+                } catch (Exception e) {
+                    log.error("incrementalSync single failed, id={}", id, e);
                 }
             }
+            log.info("incrementalSync completed, count={}", updatedIds.size());
         } catch (Exception e) {
-            log.error("incrementalRefresh failed", e);
+            log.error("incrementalSync failed", e);
         }
     }
 
-    @Scheduled(fixedRate = 30 * 60 * 1000)
+    @XxlJob("fullConsistencyCheckJob")
     public void fullConsistencyCheck() {
+        log.info("fullConsistencyCheck start");
         try {
-            List<SimpleBanner> banners = simpleBannerRepository.findByStatus(1);
+            List<Long> allIds = bannerOperationClient.getAllActiveBannerIds();
 
-            Map<String, List<SimpleBanner>> groupedByProduct = banners.stream()
-                    .collect(Collectors.groupingBy(SimpleBanner::getProductId));
-
-            for (Map.Entry<String, List<SimpleBanner>> entry : groupedByProduct.entrySet()) {
-                String productId = entry.getKey();
-
-                for (SimpleBanner banner : entry.getValue()) {
-                    refreshBannerAndUserList(productId, banner);
+            for (Long id : allIds) {
+                try {
+                    BannerSyncRequest data = bannerOperationClient.getBannerById(id);
+                    if (Objects.nonNull(data)) {
+                        bannerCacheManager.refreshBannerCache(id, data);
+                    } else {
+                        // 运营端已无此数据，清除缓存
+                        bannerCacheManager.deleteBannerCache(id);
+                    }
+                } catch (Exception e) {
+                    log.error("fullConsistencyCheck single failed, id={}", id, e);
                 }
             }
+            log.info("fullConsistencyCheck completed, count={}", allIds.size());
         } catch (Exception e) {
             log.error("fullConsistencyCheck failed", e);
-        }
-    }
-
-    private void refreshBannerAndUserList(String productId, SimpleBanner banner) {
-        List<String> dates = DateUtil.getDateRange(banner.getStartDay(), banner.getEndDay());
-
-        for (String date : dates) {
-            String lockKey = RedisKeyBuilder.bannerLock(productId, date);
-            String lockValue = redisDistributedLock.tryLock(lockKey);
-            if (lockValue == null) {
-                log.warn("refreshBannerAndUserList failed to acquire lock, productId={}, date={}", productId, date);
-                continue;
-            }
-
-            try {
-                bannerSyncService.refreshFromDatabase(productId, date);
-                bannerUserListService.refreshFromDatabase(banner.getBannerId());
-            } finally {
-                redisDistributedLock.unlock(lockKey, lockValue);
-            }
         }
     }
 }

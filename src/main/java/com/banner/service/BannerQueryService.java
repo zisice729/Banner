@@ -1,12 +1,12 @@
 package com.banner.service;
 
-import com.banner.common.dto.SimpleBannerInfo;
+import com.banner.common.dto.request.BannerSyncRequest;
 
 import java.util.List;
 
 public interface BannerQueryService {
 
-    List<SimpleBannerInfo> getBannersByDate(String productId, String date);
+    List<BannerSyncRequest> getBannersByProductAndDate(Integer productId, String date);
 
-    List<SimpleBannerInfo> getBannersByDateAndUserId(String productId, String date, Long userId);
+    List<BannerSyncRequest> getBannersByProductDateAndUserId(Integer productId, String date, Long userId);
 }
