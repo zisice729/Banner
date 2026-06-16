@@ -4,6 +4,9 @@ import com.banner.common.dto.BannerInfo;
 import com.banner.common.entity.Banner;
 import org.springframework.stereotype.Component;
 
+/**
+ * Banner对象转换器
+ */
 @Component
 public class BannerConvert {
 

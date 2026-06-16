@@ -1,5 +1,8 @@
 package com.banner.common.constant;
 
+/**
+ * 常量定义
+ */
 public class BannerConstants {
 
     public static final String BANNER_CACHE_KEY_PREFIX = "banner:";
@@ -11,7 +14,6 @@ public class BannerConstants {
     public static final int INCREMENTAL_WINDOW_MINUTES = 10;
 
     public static final String KAFKA_TOPIC_BANNER = "banner-topic";
-    public static final String KAFKA_TOPIC_BANNER_DELETE = "banner-delete-topic";
     public static final String KAFKA_CONSUMER_GROUP_ID = "banner-consumer-group";
 
     public static final String DATE_FORMAT = "yyyyMMdd";

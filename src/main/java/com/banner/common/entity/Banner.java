@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Banner实体
+ */
 @Entity
 @Table(name = "banner", indexes = {
     @Index(name = "idx_product_day", columnList = "product_id,start_day,end_day"),

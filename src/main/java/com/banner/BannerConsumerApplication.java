@@ -2,10 +2,11 @@ package com.banner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * Banner消费服务启动类
+ */
 @SpringBootApplication
-@EnableScheduling
 public class BannerConsumerApplication {
 
     public static void main(String[] args) {

@@ -70,7 +70,7 @@ Banner消费端系统是一个**高性能的Banner数据同步与查询服务**�
 │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐  │
 │  │   Redis         │ │  MySQL (管理端) │ │  Kafka Broker    │  │
 │  │  - Banner缓存   │ │  - banner表     │ │  - banner-topic │  │
-│  │  - 分布式锁     │ │                 │ │  - delete-topic │  │
+│  │  - 分布式锁     │ │  - 幂等性记录    │ │  (UPDATE/DELETE) │  │
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘  │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -247,8 +247,7 @@ CREATE TABLE `banner` (
 
 | 主题 | 说明 |
 |------|------|
-| `banner-topic` | Banner更新/新增消息 |
-| `banner-delete-topic` | Banner删除消息 |
+| `banner-topic` | Banner变更消息（更新/删除），通过changeType区分操作类型 |
 
 ### 6.2 消息体结构
 
@@ -268,7 +267,12 @@ CREATE TABLE `banner` (
 }
 ```
 
-`changeType`可选值：`UPDATE`, `DELETE`
+### 6.3 操作类型说明
+
+| changeType | 说明 | 触发场景 |
+|------------|------|----------|
+| `UPDATE` | 更新Banner缓存 | 新增Banner、修改Banner信息 |
+| `DELETE` | 删除Banner缓存 | 删除Banner |
 
 ---
 

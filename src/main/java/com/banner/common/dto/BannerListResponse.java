@@ -2,6 +2,9 @@ package com.banner.common.dto;
 
 import java.util.List;
 
+/**
+ * Banner列表响应
+ */
 public class BannerListResponse {
 
     private String productId;

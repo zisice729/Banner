@@ -1,5 +1,8 @@
 package com.banner.common.dto;
 
+/**
+ * 统一响应
+ */
 public class ApiResponse<T> {
 
     private Integer code;
@@ -21,6 +24,10 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> error(String msg) {
         return new ApiResponse<>(500, msg, null);
+    }
+
+    public static <T> ApiResponse<T> fail(Integer code, String msg) {
+        return new ApiResponse<>(code, msg, null);
     }
 
     public Integer getCode() {

@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Banner数据访问接口
+ */
 @Repository
 public interface BannerRepository extends JpaRepository<Banner, Long> {
 

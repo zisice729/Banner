@@ -2,6 +2,9 @@ package com.banner.common.dto;
 
 import java.time.LocalDate;
 
+/**
+ * Banner信息
+ */
 public class BannerInfo {
 
     private String bannerId;
@@ -14,6 +17,7 @@ public class BannerInfo {
     private LocalDate startDay;
     private LocalDate endDay;
     private Long updateTime;
+    private Long version;
     private String changeType;
 
     public BannerInfo() {
@@ -97,6 +101,14 @@ public class BannerInfo {
 
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public String getChangeType() {

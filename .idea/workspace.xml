@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ce47f0c1-dd3e-4dc0-9ccd-ada3883066c4" name="更改" comment="Banner版本二，增加人群包设计">
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/BannerConsumerApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/BannerConsumerApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/config/KafkaConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/config/KafkaConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/config/RedisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/constant/BannerConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/constant/BannerConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/dto/ApiResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/dto/ApiResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/dto/BannerInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/dto/BannerInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/dto/BannerListResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/dto/BannerListResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/entity/Banner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/entity/Banner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/util/DateUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/util/DateUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/util/JsonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/util/JsonUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/common/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/common/util/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/controller/BannersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/controller/BannersController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/convert/BannerConvert.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/convert/BannerConvert.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/lock/RedisDistributedLock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/lock/RedisDistributedLock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/mq/consumer/BannerConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/mq/consumer/BannerConsumer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/mq/producer/BannerMqProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/mq/producer/BannerMqProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/repository/BannerRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/repository/BannerRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/scheduler/BannerScheduledTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/scheduler/BannerScheduledTask.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/service/impl/BannerCacheManagerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/service/impl/BannerCacheManagerImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/banner/service/impl/BannerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/banner/service/impl/BannerServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="3EGEX2ar3CDbjDX1hY0XPjFJz1w" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.BannerConsumerApplication.executor": "Run",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/didi/project/Banner",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="Spring Boot.BannerConsumerApplication">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Banner" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Banner" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="BannerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="banner-consumer-system" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.banner.BannerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BannerConsumerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="banner-consumer-system" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.banner.BannerConsumerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.23774.435" />
+        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-IU-251.23774.435" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="ce47f0c1-dd3e-4dc0-9ccd-ada3883066c4" name="更改" comment="" />
+      <created>1779796541295</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779796541295</updated>
+      <workItem from="1779796542341" duration="2739000" />
+      <workItem from="1779854495498" duration="24505000" />
+      <workItem from="1780920998164" duration="17121000" />
+      <workItem from="1781588703509" duration="689000" />
+      <workItem from="1781589417968" duration="12506000" />
+    </task>
+    <task id="LOCAL-00001" summary="Banner版本二，增加人群包设计">
+      <option name="closed" value="true" />
+      <created>1779883589946</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1779883589946</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Banner版本二，增加人群包设计" />
+    <option name="LAST_COMMIT_MESSAGE" value="Banner版本二，增加人群包设计" />
+  </component>
+</project>
