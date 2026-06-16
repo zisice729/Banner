@@ -74,7 +74,7 @@ Banner消费端系统是一个**高性能的Banner缓存同步与查询服务**�
 | **service** | 业务逻辑：缓存管理、查询服务 | `BannerCacheManager`, `BannerQueryService` |
 | **controller** | 控制层：C端查询接口 | `BannerController` |
 | **cache** | 缓存组件：本地缓存失效监听 | `CacheInvalidationListener` |
-| **config** | 配置类：Redis、Kafka、Caffeine、数据源 | `RedisConfig`, `GuavaCacheConfig` |
+| **config** | 配置类：Redis、Kafka、Caffeine、数据源 | `RedisConfig`, `CaffeineCacheConfig` |
 | **scheduler** | 定时任务：增量同步+全量一致性检查 | `BannerScheduledTask` |
 | **lock** | 分布式锁 | `RedisDistributedLock` |
 | **repository** | 数据访问：MQ消费记录（H2内存数据库） | `MqConsumeRecordRepository` |
@@ -234,46 +234,70 @@ public class BannerMessage {
 
 | 配置 | 值 | 说明 |
 |------|-----|------|
-| USER_BUCKET_SIZE | 5000 | 每个桶最多存储5000个用户ID |
+| USER_BUCKET_COUNT | 1000 | 固定桶数量，用于取模定位 |
+| USER_BUCKET_SIZE | 5000 | RPC分页大小 |
 
 **Redis Key设计**：
 
 | Key | 类型 | 说明 |
 |-----|------|------|
 | `banner:{id}:users:{bucketIndex}` | Set | 分桶存储用户ID |
-| `banner:{id}:users:bucket_count` | String | 桶数量 |
+| `banner:no_user_list` | Set | 无人群限制的Banner ID集合 |
+
+### 6.3 取模定位桶（O(1)查询）
+
+写入和查询都使用`userId % 1000`定位桶，查询效率从O(n)提升到O(1)：
+
+```
+写入：bucketIndex = userId % 1000
+查询：bucketIndex = userId % 1000
+```
 
 **写入流程**：
 ```
-分页RPC获取用户列表(每页5000)
-    → 每页写入一个Redis Set桶
-    → 记录桶数量
+获取用户列表
+    → 遍历每个userId
+    → bucketIndex = userId % 1000
+    → SADD banner:{id}:users:{bucketIndex} userId
 ```
 
 **查询流程**：
 ```
 containsUserId(id, userId):
-    → 获取桶数量
-    → 遍历所有桶执行 SISMEMBER
-    → 找到即返回true
-
-getUserIdsFromCache(id):
-    → 获取桶数量
-    → 遍历所有桶执行 SMEMBERS
-    → 合并返回
+    → 快速判断：SISMEMBER banner:no_user_list id
+    → 如果在无用户限制集合中 → 返回true
+    → 否则：bucketIndex = userId % 1000
+    → SISMEMBER banner:{id}:users:{bucketIndex} userId
 ```
+
+### 6.4 空用户列表快速判断
+
+无人群限制的Banner（对所有用户可见）添加到集合`banner:no_user_list`，查询时先判断：
+
+```
+用户请求时：
+    → SISMEMBER banner:no_user_list {bannerId}
+    → 存在 → 对所有用户可见，无需查人群桶
+    → 不存在 → 查询人群桶判断
+```
+
+### 6.5 固定桶数量的优势
+
+- **一致性**：缓存刷新后，同一userId的桶位置不变
+- **简单**：不需要存储桶数量
+- **查询O(1)**：取模一次定位，无需遍历
 
 ---
 
 ## 七、Redis Key设计
 
-所有Key使用`String.format`统一管理：
+所有Key通过`RedisKeyBuilder`使用`String.format`统一管理：
 
 | Key模板 | 示例 | 类型 | 说明 |
 |---------|------|------|------|
 | `banner:%d:info` | `banner:123:info` | String | Banner基本信息JSON |
-| `banner:%d:users:%d` | `banner:123:users:0` | Set | 用户ID分桶 |
-| `banner:%d:users:bucket_count` | `banner:123:users:bucket_count` | String | 桶数量 |
+| `banner:%d:users:%d` | `banner:123:users:0` | Set | 用户ID分桶（固定1000个桶） |
+| `banner:no_user_list` | `banner:no_user_list` | Set | 无人群限制的Banner ID集合 |
 | `banner:%d:lock` | `banner:123:lock` | String | 分布式锁 |
 | `banner:product:%d:date:%s` | `banner:product:1:date:20260607` | Set | 按产品+日期索引Banner ID |
 

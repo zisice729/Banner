@@ -16,5 +16,6 @@ public class BannerConstants {
 
     // === 分桶配置 ===
     public static final int USER_BUCKET_SIZE = 5000;
+    public static final int USER_BUCKET_COUNT = 1000;  // 固定桶数量，用于取模定位
 
 }

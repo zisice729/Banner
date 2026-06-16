@@ -2,6 +2,7 @@ package com.banner.service.impl;
 
 import com.banner.common.constant.BannerConstants;
 import com.banner.common.dto.request.BannerSyncRequest;
+import com.banner.common.util.DateUtil;
 import com.banner.common.util.JsonUtil;
 import com.banner.common.util.RedisKeyBuilder;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -28,48 +29,28 @@ public class BannerCacheManagerImpl implements BannerCacheManager {
     @Autowired
     private Cache<String, BannerSyncRequest> bannerLocalCache;
 
-    @Autowired
-    private Cache<String, List<Long>> bannerUserLocalCache;
-
     @Override
     public void refreshBannerCache(Long id, BannerSyncRequest data) {
         // 1. 更新Redis - Banner基本信息
         String bannerKey = RedisKeyBuilder.bannerCache(id);
         redisTemplate.opsForValue().set(bannerKey, JsonUtil.toJson(data));
 
-        // 2. 更新Redis - 用户列表分桶存储
-        // 先删除旧桶
-        String bucketCountKey = RedisKeyBuilder.bannerUserBucketCount(id);
-        Object oldCountObj = redisTemplate.opsForValue().get(bucketCountKey);
-        if (Objects.nonNull(oldCountObj)) {
-            int oldCount = Integer.parseInt(oldCountObj.toString());
-            for (int i = 0; i < oldCount; i++) {
-                redisTemplate.delete(RedisKeyBuilder.bannerUserBucket(id, i));
-            }
-        }
-
-        // 写入新桶
+        // 2. 更新Redis - 用户列表（按取模分桶）
         List<Long> userIds = data.getUserIds();
-        if (Objects.nonNull(userIds) && !userIds.isEmpty()) {
-            int bucketSize = BannerConstants.USER_BUCKET_SIZE;
-            int bucketCount = (userIds.size() + bucketSize - 1) / bucketSize;
-
-            for (int i = 0; i < bucketCount; i++) {
-                int from = i * bucketSize;
-                int to = Math.min(from + bucketSize, userIds.size());
-                List<Long> bucketUserIds = userIds.subList(from, to);
-
-                String bucketKey = RedisKeyBuilder.bannerUserBucket(id, i);
-                String[] userIdStrs = bucketUserIds.stream()
-                        .map(String::valueOf)
-                        .toArray(String[]::new);
-                redisTemplate.opsForSet().add(bucketKey, (Object[]) userIdStrs);
-            }
-
-            // 记录桶数量
-            redisTemplate.opsForValue().set(bucketCountKey, String.valueOf(bucketCount));
+        if (Objects.isNull(userIds) || userIds.isEmpty()) {
+            // 无人群限制，添加到无用户列表集合
+            redisTemplate.opsForSet().add(RedisKeyBuilder.bannerNoUserList(), String.valueOf(id));
         } else {
-            redisTemplate.delete(bucketCountKey);
+            // 有人群限制，从无用户列表集合移除
+            redisTemplate.opsForSet().remove(RedisKeyBuilder.bannerNoUserList(), String.valueOf(id));
+
+            // 按userId取模分配到固定桶
+            int bucketCount = BannerConstants.USER_BUCKET_COUNT;
+            for (Long userId : userIds) {
+                int bucketIndex = (int) (userId % bucketCount);
+                String bucketKey = RedisKeyBuilder.bannerUserBucket(id, bucketIndex);
+                redisTemplate.opsForSet().add(bucketKey, String.valueOf(userId));
+            }
         }
 
         // 3. 更新按product+date索引
@@ -78,10 +59,11 @@ public class BannerCacheManagerImpl implements BannerCacheManager {
             redisTemplate.opsForSet().add(productDateKey, String.valueOf(id));
         }
 
-        // 4. 发布本地缓存失效通知（所有机器包括本机都会收到）
+        // 4. 发布本地缓存失效通知
         redisTemplate.convertAndSend(RedisKeyBuilder.CACHE_INVALIDATE_CHANNEL, String.valueOf(id));
 
-        log.info("refreshBannerCache completed, id={}", id);
+        log.info("refreshBannerCache completed, id={}, userCount={}", id, 
+                Objects.isNull(userIds) ? 0 : userIds.size());
     }
 
     @Override
@@ -90,18 +72,16 @@ public class BannerCacheManagerImpl implements BannerCacheManager {
         String bannerKey = RedisKeyBuilder.bannerCache(id);
         redisTemplate.delete(bannerKey);
 
-        // 2. 删除Redis - 所有用户桶
-        String bucketCountKey = RedisKeyBuilder.bannerUserBucketCount(id);
-        Object countObj = redisTemplate.opsForValue().get(bucketCountKey);
-        if (Objects.nonNull(countObj)) {
-            int bucketCount = Integer.parseInt(countObj.toString());
-            for (int i = 0; i < bucketCount; i++) {
-                redisTemplate.delete(RedisKeyBuilder.bannerUserBucket(id, i));
-            }
+        // 2. 删除Redis - 所有用户桶（固定1000个桶）
+        int bucketCount = BannerConstants.USER_BUCKET_COUNT;
+        for (int i = 0; i < bucketCount; i++) {
+            redisTemplate.delete(RedisKeyBuilder.bannerUserBucket(id, i));
         }
-        redisTemplate.delete(bucketCountKey);
 
-        // 3. 发布本地缓存失效通知
+        // 3. 从无用户列表集合移除
+        redisTemplate.opsForSet().remove(RedisKeyBuilder.bannerNoUserList(), String.valueOf(id));
+
+        // 4. 发布本地缓存失效通知
         redisTemplate.convertAndSend(RedisKeyBuilder.CACHE_INVALIDATE_CHANNEL, String.valueOf(id));
 
         log.info("deleteBannerCache completed, id={}", id);
@@ -131,40 +111,18 @@ public class BannerCacheManagerImpl implements BannerCacheManager {
 
     @Override
     public List<Long> getUserIdsFromCache(Long id) {
-        // 查询所有桶
-        String bucketCountKey = RedisKeyBuilder.bannerUserBucketCount(id);
-
-        // 1. 先查本地缓存的桶数量
-        List<Long> bucketCountCached = bannerUserLocalCache.getIfPresent(bucketCountKey);
-        int bucketCount;
-        if (Objects.nonNull(bucketCountCached) && !bucketCountCached.isEmpty()) {
-            bucketCount = bucketCountCached.size();
-        } else {
-            Object countObj = redisTemplate.opsForValue().get(bucketCountKey);
-            if (Objects.isNull(countObj)) {
-                return new ArrayList<>();
-            }
-            bucketCount = Integer.parseInt(countObj.toString());
-        }
-
-        // 2. 遍历所有桶获取userId
         List<Long> allUserIds = new ArrayList<>();
+        int bucketCount = BannerConstants.USER_BUCKET_COUNT;
+
+        // 遍历所有桶获取userId
         for (int i = 0; i < bucketCount; i++) {
             String bucketKey = RedisKeyBuilder.bannerUserBucket(id, i);
-
-            List<Long> cachedBucket = bannerUserLocalCache.getIfPresent(bucketKey);
-            if (Objects.nonNull(cachedBucket)) {
-                allUserIds.addAll(cachedBucket);
-                continue;
-            }
-
             Set<Object> members = redisTemplate.opsForSet().members(bucketKey);
             if (Objects.nonNull(members) && !members.isEmpty()) {
                 List<Long> bucketUserIds = members.stream()
                         .map(obj -> Long.parseLong(obj.toString()))
                         .toList();
                 allUserIds.addAll(bucketUserIds);
-                bannerUserLocalCache.put(bucketKey, bucketUserIds);
             }
         }
 
@@ -173,26 +131,27 @@ public class BannerCacheManagerImpl implements BannerCacheManager {
 
     @Override
     public boolean containsUserId(Long id, Long userId) {
-        String bucketCountKey = RedisKeyBuilder.bannerUserBucketCount(id);
-        Object countObj = redisTemplate.opsForValue().get(bucketCountKey);
-        if (Objects.isNull(countObj)) {
-            return true;
+        // 1. 快速判断：是否在无人群限制集合中
+        Boolean isNoUserList = redisTemplate.opsForSet()
+                .isMember(RedisKeyBuilder.bannerNoUserList(), String.valueOf(id));
+        if (Boolean.TRUE.equals(isNoUserList)) {
+            return true;  // 无人群限制，对所有用户可见
         }
-        int bucketCount = Integer.parseInt(countObj.toString());
 
-        // 在所有桶中查找
-        for (int i = 0; i < bucketCount; i++) {
-            String bucketKey = RedisKeyBuilder.bannerUserBucket(id, i);
-            Boolean isMember = redisTemplate.opsForSet().isMember(bucketKey, String.valueOf(userId));
-            if (Boolean.TRUE.equals(isMember)) {
-                return true;
-            }
-        }
-        return false;
+        // 2. 取模定位桶，O(1)时间复杂度
+        int bucketIndex = (int) (userId % BannerConstants.USER_BUCKET_COUNT);
+        String bucketKey = RedisKeyBuilder.bannerUserBucket(id, bucketIndex);
+        Boolean isMember = redisTemplate.opsForSet().isMember(bucketKey, String.valueOf(userId));
+
+        return Boolean.TRUE.equals(isMember);
     }
 
     @Override
     public List<BannerSyncRequest> getBannersByProductAndDate(Integer productId, String date) {
+        if (Objects.isNull(date) || date.trim().isEmpty()) {
+            date = DateUtil.todayStr();
+        }
+
         String productDateKey = RedisKeyBuilder.bannerProductDate(productId, date);
         Set<Object> bannerIds = redisTemplate.opsForSet().members(productDateKey);
         if (Objects.isNull(bannerIds) || bannerIds.isEmpty()) {
@@ -221,6 +180,6 @@ public class BannerCacheManagerImpl implements BannerCacheManager {
         if (Objects.nonNull(data.getStartTime())) {
             return String.valueOf(data.getStartTime());
         }
-        return com.banner.common.util.DateUtil.todayStr();
+        return DateUtil.todayStr();
     }
 }
