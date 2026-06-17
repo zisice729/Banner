@@ -21,6 +21,13 @@ public class DateUtil {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(FORMATTER_YYYYMMDD);
     }
 
+    public static String formatYYYYMMDD(Long timestamp) {
+        if (timestamp == null) {
+            return todayStr();
+        }
+        return new Date(timestamp).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(FORMATTER_YYYYMMDD);
+    }
+
     public static LocalDate parseYYYYMMDD(String dateStr) {
         return LocalDate.parse(dateStr, FORMATTER_YYYYMMDD);
     }
