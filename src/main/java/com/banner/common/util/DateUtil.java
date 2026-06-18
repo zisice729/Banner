@@ -1,20 +1,21 @@
 package com.banner.common.util;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.time.ZoneId;
 import java.util.List;
 
 public class DateUtil {
 
     private static final DateTimeFormatter FORMATTER_YYYYMMDD = DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static final DateTimeFormatter FORMATTER_YYYY_MM_DD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static String formatToYYYYMMDD(LocalDate date) {
-        return date.format(FORMATTER_YYYYMMDD);
+    private DateUtil() {
+    }
+
+    public static String todayStr() {
+        return LocalDate.now().format(FORMATTER_YYYYMMDD);
     }
 
     public static String formatToYYYYMMDD(Date date) {
@@ -28,30 +29,21 @@ public class DateUtil {
         return new Date(timestamp).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(FORMATTER_YYYYMMDD);
     }
 
-    public static LocalDate parseYYYYMMDD(String dateStr) {
-        return LocalDate.parse(dateStr, FORMATTER_YYYYMMDD);
-    }
-
-    public static List<String> getDateRange(LocalDate startDay, LocalDate endDay) {
+    public static List<String> getDateRange(Long startTimestamp, Long endTimestamp) {
         List<String> dates = new ArrayList<>();
-        LocalDate current = startDay;
-        while (!current.isAfter(endDay)) {
-            dates.add(formatToYYYYMMDD(current));
+        if (startTimestamp == null || endTimestamp == null) {
+            return dates;
+        }
+        
+        LocalDate startDate = new Date(startTimestamp).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endDate = new Date(endTimestamp).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            dates.add(current.format(FORMATTER_YYYYMMDD));
             current = current.plusDays(1);
         }
+        
         return dates;
     }
-
-    public static String todayStr() {
-        return LocalDate.now().format(FORMATTER_YYYYMMDD);
-    }
-
-    public static LocalDateTime minusMinutes(int minutes) {
-        return LocalDateTime.now().minusMinutes(minutes);
-    }
-
-    public static Date toDate(LocalDateTime localDateTime) {
-        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-    }
-
 }

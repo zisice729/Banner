@@ -2,22 +2,16 @@ package com.banner.common.enums;
 
 public enum MessageType {
 
-    SYNC(1, "同步"),
-    DELETE(2, "删除");
+    UPDATE(1),
+    DELETE(2);
 
-    private final int code;
-    private final String desc;
+    private final Integer code;
 
-    MessageType(int code, String desc) {
+    MessageType(Integer code) {
         this.code = code;
-        this.desc = desc;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
-    }
-
-    public String getDesc() {
-        return desc;
     }
 }

@@ -1,6 +1,6 @@
 package com.banner.client;
 
-import com.banner.infrastructure.dto.BannerSyncRequest;
+import com.banner.common.dto.Banner;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -9,9 +9,9 @@ import java.util.List;
 @Component
 public class BannerOperationClient {
 
-    public BannerSyncRequest getBannerById(Long id) {
-        BannerSyncRequest data = new BannerSyncRequest();
-        data.setId(id);
+    public Banner getBannerById(Long bannerId) {
+        Banner data = new Banner();
+        data.setId(bannerId);
         data.setProductId(1);
         data.setTitle("Test Banner");
         data.setImageUrl("https://example.com/image.jpg");
@@ -20,6 +20,7 @@ public class BannerOperationClient {
         data.setStatus(1);
         data.setStartTime(System.currentTimeMillis());
         data.setEndTime(System.currentTimeMillis() + 86400000L);
+        data.setBucketCount(1);
         return data;
     }
 
