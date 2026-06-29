@@ -2,10 +2,25 @@ package com.banner.common.dto;
 
 import java.util.List;
 
+/**
+ * Banner查询响应DTO
+ * 包含产品ID、日期和Banner列表
+ */
 public class BannerQueryResponse {
 
+    /**
+     * 产品ID
+     */
     private Integer productId;
+
+    /**
+     * 查询日期（格式：yyyyMMdd）
+     */
     private String date;
+
+    /**
+     * Banner列表（已过滤人群包，按优先级降序排列）
+     */
     private List<BannerSimpleInfo> banners;
 
     public BannerQueryResponse() {
@@ -41,11 +56,34 @@ public class BannerQueryResponse {
         this.banners = banners;
     }
 
+    /**
+     * Banner简要信息
+     * 用于对外返回，不包含敏感字段（如人群包用户列表）
+     */
     public static class BannerSimpleInfo {
+        /**
+         * Banner ID
+         */
         private Long id;
+
+        /**
+         * Banner标题
+         */
         private String title;
+
+        /**
+         * Banner图片URL
+         */
         private String imageUrl;
+
+        /**
+         * Banner跳转链接URL
+         */
         private String linkUrl;
+
+        /**
+         * 优先级（数值越大优先级越高）
+         */
         private Integer priority;
 
         public BannerSimpleInfo() {

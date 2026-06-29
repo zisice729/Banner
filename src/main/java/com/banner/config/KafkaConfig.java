@@ -17,10 +17,21 @@ import org.springframework.kafka.core.ProducerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Kafka配置
+ * 配置生产者、消费者和监听器容器工厂
+ * 注：当前仅消费者使用，生产者由上游系统提供
+ */
 @Configuration
 @EnableKafka
 public class KafkaConfig {
 
+    /**
+     * 创建Kafka生产者工厂
+     * 配置Bootstrap Servers、序列化器等
+     *
+     * @return ProducerFactory实例
+     */
     @Bean
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
@@ -30,11 +41,23 @@ public class KafkaConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+    /**
+     * 创建KafkaTemplate
+     * 用于发送消息（当前项目主要使用消费者，此Bean保留备用）
+     *
+     * @return KafkaTemplate实例
+     */
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
+    /**
+     * 创建Kafka消费者工厂
+     * 配置Bootstrap Servers、消费者组ID、反序列化器等
+     *
+     * @return ConsumerFactory实例
+     */
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -45,6 +68,12 @@ public class KafkaConfig {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
+    /**
+     * 创建Kafka监听器容器工厂
+     * 用于@KafkaListener注解的消费者
+     *
+     * @return ConcurrentKafkaListenerContainerFactory实例
+     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =

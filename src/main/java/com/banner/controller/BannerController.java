@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Banner控制器
  * 对外HTTP接口层，接收请求并调用Service层
+ * 接口路径：/api/banners
  */
 @RestController
 @RequestMapping("/api/banners")
@@ -22,14 +23,16 @@ public class BannerController {
 
     /**
      * 查询Banner列表
-     * 根据产品ID、日期、用户ID筛选出用户可见的Banner
-     * POST /api/banners
+     * 根据产品ID和用户ID筛选出用户可见的Banner
+     * 日期由系统内部获取（当前日期），无需前端传递
+     *
+     * @param request 请求体，包含productId（产品ID）和userId（用户ID）
+     * @return ApiResponse<BannerQueryResponse> 包含产品ID、日期和Banner列表
      */
     @PostMapping
     public ApiResponse<BannerQueryResponse> getBanners(BannerQueryRequest request) {
         BannerQueryResponse response = bannerService.queryBanners(
                 request.getProductId(),
-                request.getDate(),
                 request.getUserId()
         );
         return ApiResponse.success(response);
